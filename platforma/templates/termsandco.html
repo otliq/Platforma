@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Terms and Conditions</title>
+  </head>
+  <style>
+        *{
+            box-sizing: border-box;
+        }
+        body{
+            background: #000000;
+            color: #eee;
+            font-family: "Times New Roman", serif;
+            padding: 50px;
+            font-size: 16px;
+        }
+        .container{
+            margin: 20px auto;
+            padding: 10px;
+            width: 300px;
+            background-color: #000000;
+            height: 300px;
+            border-radius: 5px;
+        }
+         h1{
+             width: 70%;
+            color: #eee;
+            font-size: 32px;
+            margin: 28px auto;
+            margin-bottom: 20px;
+            text-align: center;
+            /*padding-top: 40px;*/
+        }
+        form{
+            /*padding: 15px;*/
+            text-align: center;
+        }
+        input{
+            padding: 12px 0;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            border: 2px solid transparent;
+            text-align: center;
+            width: 90%;
+            font-size: 16px;
+            transition: border .2s, background-color .2s;
+        }
+    
+        .pass-link{
+            text-align: center;
+        }
+        .pass-link a:link,
+        .pass-link a:visited{
+            font-size: 16px;
+            color: #eee;
+        }
+    </style>
+  <body>
+    <div style="display: flex;">
+      <div style="width: 50%; margin-right: 20px; justify-content: center; border: 1px solid orange;">
+        <h1>Условия использования сайта</h1>
+        <p>
+          <strong>Правила и условия:</strong>
+          <ol>
+            <li>Пользователи соглашаются соблюдать все законы и правила, регулирующие использование нашего сайта.</li>
+            <li>Пользователи не могут использовать наш сайт для распространения незаконного контента или для нарушения прав других пользователей.</li>
+            <li>Мы не несем ответственности за любые убытки, которые могут возникнуть в результате использования нашего сайта.</li>
+            <li>Мы оставляем за собой право в любое время изменять или прекращать работу нашего сайта без предварительного уведомления.</li>
+            <li>Наш сайт использует данные из внешних источников, которые могут изменить свое поведение или доступность в любое время. Мы не несем ответственности за любые убытки, которые могут возникнуть в результате недоступности или неточности этих данных.</li>
+            <li>Оставаясь на нашем сайте, вы соглашаетесь со всеми нашими правилами и условиями.</li>
+          </ol>
+          <strong>Отказ от ответственности:</strong>
+          <ol>
+            <li>Мы не несем ответственности за любые убытки или ущерб, прямо или косвенно связанные с использованием нашего сайта.</li>
+            <li>Мы не гарантируем точность или полноту информации, представленной на нашем сайте, и не несем ответственности за любые убытки, которые могут возникнуть в результате использования этой информации.</li>
+            <li>Мы не несем ответственности за любой контент или материалы, представленные на нашем сайте другими пользователями.</li>
+            <li>Мы оставляем за собой право в любое время изменять или прекращать работу нашего сайта без предварительного уведомления.</li>
+            <li>Наш сайт использует данные из внешних источников, которые могут изменить свое поведение или доступность в любое время. Мы не несем ответственности за любые убытки, которые могут возникнуть в результате недоступности или неточности этих данных.</li>
+            <li>Оставаясь на нашем сайте, вы соглашаетесь со всеми нашими правилами и условиями.</li>
+          </ol>
+        </p>
+      </div>
+      <div style="width: 50%; justify-content: center; border: 1px solid orange;">
+        <h1>Terms and Conditions</h1>
+        <p>
+          <strong>Terms and Conditions:</strong>
+          <ol>
+            <li>Users agree to comply with all laws and regulations governing the use of our website.</li>
+            <li>Users may not use our website for the distribution of illegal content or for the infringement of the rights of other users.</li>
+            <li>We are not responsible for any losses that may arise from the use of our website.</li>
+            <li>We reserve the right to change or terminate the operation of our website at any time without prior notice.</li>
+            <li>Our website uses data from external sources, which may change their behavior or availability at any time. We are not responsible for any losses that may arise from the unavailability or inaccuracy of this data.</li>
+            <li>By remaining on our website, you agree to all our rules and conditions.</li>
+          </ol>
+          <strong>Disclaimer:</strong>
+          <ol>
+            <li>We are not liable for any losses or damages, directly or indirectly related to the use of our website.</li>
+            <li>We do not guarantee the accuracyor completeness of the information presented on our website and are not responsible for any losses that may arise from the use of this information.</li>
+            <li>We are not responsible for any content or materials provided on our website by other users.</li>
+            <li>We reserve the right to change or terminate the operation of our website at any time without prior notice.</li>
+            <li>Our website uses data from external sources, which may change their behavior or availability at any time. We are not responsible for any losses that may arise from the unavailability or inaccuracy of this data.</li>
+            <li>By remaining on our website, you agree to all our rules and conditions.</li>
+          </ol>
+        </p>
+      </div>
+    </div>
+    <div class="pass-link">
+        <label><a href="{% url 'login' %}" >I agree with the Terms and Conditions</a></label>
+    </div>	
+  </body>
+</html>
