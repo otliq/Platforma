@@ -14,6 +14,8 @@ from .forms import LoginUserForm
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 def index(request):
     delete_inactive_users()
@@ -68,7 +70,7 @@ def get_data(fiat='RUB', asset="USDT", pay='TinkoffNew', type='SELL', vol=15000)
         print(e)  # выводим сообщение об ошибке
         return {'error': 'Something went wrong'}
 
-@csrf_exempt
+# @csrf_exempt
 def update_table(request, type='BUY', fiat='RUB', asset="USDT", pay='TinkoffNew'):
     # Получение параметров запроса
     if request.user.is_authenticated:
@@ -106,3 +108,36 @@ def delete_inactive_users():
     one_month_ago = timezone.now() - timedelta(days=31)
     inactive_users = User.objects.filter(is_active=True, date_joined__lt=one_month_ago)
     inactive_users.delete()
+    
+class PlatformaRatesView(APIView):
+    def get(self, request):
+        type = request.GET.get('type', 'BUY')
+        fiat = request.GET.get('fiat', 'RUB')
+        asset = request.GET.get('asset', 'USDT')
+        pay = request.GET.get('pay', 'TinkoffNew')
+
+        response = get_data(type=type, fiat=fiat, asset=asset, pay=pay)
+        prices = []
+        volumes = []
+        # links = []
+        try:
+            data = response['data'][:10]
+            for item in data:
+                price = float(item['adv']['price'])
+                prices.append(price)
+                volume = float(item['adv']['tradableQuantity'])
+                volumes.append(volume)
+                # userno = item['advertiser']['userNo']
+                # link = f"https://p2p.binance.com/en/advertiserDetail?advertiserNo={userno}"
+                # links.append(link)
+                
+            rates = {
+                'prices': prices,
+                'volumes': volumes,
+                # 'links': links,
+            }
+            
+            return Response(rates)
+            
+        except KeyError:
+            return Response({'error': 'API response is missing required data'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -302,9 +302,14 @@
         var fiat = $('select[name="Fiat"]').val();
         var pay = $('select[name="Trade Method"]').val();
         var crypto = $('select[name="Crypto"]').val();
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
         $.ajax({
             url: urlBuy,
             type: 'POST',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
             data: {
                 'fiat': fiat,
                 'pay': pay,
