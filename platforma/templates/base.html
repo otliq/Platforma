@@ -27,11 +27,11 @@
         justify-content: space-between;
       }
       .home-btn-group {
-        display: right;
-        align-items: center;
-        flex-direction: row;
-        justify-content: space-between;
-      }
+          display: flex;
+          align-items: center;
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
 
       .home-container1 {
         width: 100%;
@@ -98,17 +98,16 @@
           padding: var(--dl-space-space-unit);
         }
       }
-        /* Блоки с фундаментальными показателями, описанием, ценовыми данными и графиками */
         .home-fundamentals{
             width: 300px;
             max-width: 300px;
             border: 1px solid #272624;
             margin: 0 auto; /* горизонтальные отступы равны "auto" */
         }
-        #marketPrice {
+        #marketPrice,#marketPrice2,#marketPrice3 {
             display: block;
             text-align: left;
-            font-size: 20px;
+            font-size: 15px;
             margin-top: 20px;
         }
         table.asksTable, table.bidsTable {
@@ -146,6 +145,9 @@
         .bidsTable td:first-child {
             color: green;
         }
+        #Charts {
+          display: none;
+        }
 </style>
 </head>
 {% if user.is_authenticated %}
@@ -155,6 +157,9 @@
       {% csrf_token %}
       <button class="button" type="submit">Logout</button>
     </form>
+  <p style="display: flex;">Welcome, {{ user.username }}!</p>
+  <input type="checkbox" id="myCheckbox" onchange="toggleInfo()" style="display: flex;">
+  <label for="myCheckbox">Desktop</label>
 </div>
 <div class="home-main">
     <span>Fiat</span>
@@ -172,7 +177,7 @@
         <option value="CAD">CAD</option>
         <option value="AUD">AUD</option>
         <option value="NZD">NZD</option>
-        <option value="KWD">KWD</option>
+        <!-- <option value="KWD">KWD</option> -->
     </select>
     <span>Trade Method</span>
     <select name="Trade Method" required class="home-select2"></select>
@@ -260,10 +265,10 @@
             { value: "Wise", text: "Wise" },
             { value: "BANK", text: "BANK" },
         ],
-        KWD: [
-            { value: "KFH", text: "Kuwait Finance House" },
-            { value: "BANK", text: "BANK" },
-        ],
+        // KWD: [
+        //     { value: "KFH", text: "Kuwait Finance House" },
+        //     { value: "BANK", text: "BANK" },
+        // ],
         };
         const fiatSelect = document.querySelector('select[name="Fiat"]');
         const tradeMethodSelect = document.querySelector(
@@ -303,7 +308,6 @@
         var pay = $('select[name="Trade Method"]').val();
         var crypto = $('select[name="Crypto"]').val();
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
         $.ajax({
             url: urlBuy,
             type: 'POST',
@@ -317,6 +321,124 @@
                 'crypto': crypto,
             },
             success: function(data) {
+                if (data && data.hasOwnProperty('gasks')) {
+                    // Garantex asks data
+                    const gasks = data.gasks;
+                    var garantex_asks_cum = {
+                        cumQuant: [],
+                        price: [],
+                    };
+                    var cum = 0;
+                    for (var l = 0; l < data.gasks.length; l++) {
+                        cum += parseFloat(data.gasks[l].volume);
+                        garantex_asks_cum.cumQuant.push(parseFloat(cum.toFixed(2)));
+                        garantex_asks_cum.price.push(parseFloat(data.gasks[l].price));
+
+                    }
+                    // Garantex bids data
+                    const gbids = data.gbids;
+                    var garantex_bids_cum = {
+                        cumQuant: [],
+                        price: [],
+                    };
+                    var cum = 0;
+                    for (var l = 0; l < data.gbids.length; l++) {
+                        cum += parseFloat(data.gbids[l].volume);
+                        garantex_bids_cum.cumQuant.push(parseFloat(cum.toFixed(2)));
+                        garantex_bids_cum.price.push(parseFloat(data.gbids[l].price));
+                    }
+                    
+                    // Garantex asks table 
+                    var gasksTablebody = $('#GasksTable tbody');
+                    gasksTablebody.empty();
+                    var s = data.gasks.length - 1;
+                    var cum = 0;
+                    for (var f = data.gasks.length -1;f >=0 && s >-1; f--) {
+                        var grow = $('<tr>');
+                        grow.append($('<td>').text(parseFloat(data.gasks[f].price)));
+                        // grow.append($('<td>').text(parseFloat(data.gasks[f].volume)));
+                        grow.append($('<td>').html('<a href="https://garantex.io/trading/' + data.link + '">' + data.gasks[f].volume + '</a>'));
+                        grow.append($('<td>').text(garantex_asks_cum.cumQuant[s].toFixed(2)));
+                        gasksTablebody.append(grow);
+                        s -= 1;
+                    }
+                    // Garantex bids table 
+                    var gbidsTablebody = $('#GbidsTable tbody');
+                    gbidsTablebody.empty();
+                    var cum = 0;
+                    for (var x = 0; x < data.gbids.length; x++) {
+                        var grow2 = $('<tr>');
+                        grow2.append($('<td>').text(data.gbids[x].price));
+                        grow2.append($('<td>').html('<a href="https://garantex.io/trading/' + data.link + '">' + data.gbids[x].volume + '</a>'));
+                        // grow2.append($('<td>').text(data.gbids[x].volume));
+                        cum += parseFloat(data.gbids[x].volume);
+                        grow2.append($('<td>').text(cum.toFixed(2)));
+                        gbidsTablebody.append(grow2);
+                    }
+                }
+                // Huobi asks table
+                var hasksTablebody = $('#hasksTable tbody');
+                hasksTablebody.empty();
+                var hasks = {
+                    price: [],
+                    quant: [],
+                    cumQuant: []
+                };
+                var cum = 0;
+                for (var l = 0; l < data.hasks.length; l++) {
+                    hasks.price.push(parseFloat(data.hasks[l].price));
+                    hasks.quant.push(parseFloat(data.hasks[l].tradeCount));
+                    cum += parseFloat(data.hasks[l].tradeCount);
+                    hasks.cumQuant.push(parseFloat(cum.toFixed(2)));
+                }
+                var h = data.hasks.length - 1;
+                for (var i = data.hasks.length - 1; i >= 0 && h > -1; i--) {
+                    var hrow = $('<tr>');
+                    hrow.append($('<td>').text(data.hasks[i].price));
+                    hrow.append($('<td>').html('<a href="https://www.huobi.com/ru-ru/fiat-crypto/trader/' + data.hasks[i].uid + '">' + data.hasks[i].tradeCount + '</a>'));
+                    hrow.append($('<td>').text(hasks.cumQuant[h]));
+                    hasksTablebody.append(hrow);
+                    h -= 1;
+                } 
+
+                // Huobi bids table 
+                var hbidsTablebody = $('#hbidsTable tbody');
+                hbidsTablebody.empty();
+                var hbids = {
+                    price: [],
+                    quant: [],
+                    cumQuant: []
+                };
+                var cum = 0;
+                for (var q = 0; q < data.hbids.length; q++) {
+                    var hroww = $('<tr>');
+                    hroww.append($('<td>').text(data.hbids[q].price ));
+                    hroww.append($('<td>').html('<a href="https://www.huobi.com/ru-ru/fiat-crypto/trader/' + data.hbids[q].uid + '">' + data.hbids[q].tradeCount + '</a>'));
+                    cum += parseFloat(data.hbids[q].tradeCount);
+                    hroww.append($('<td>').text(cum.toFixed(2)));
+
+                    hbids.quant.push(parseFloat(data.hbids[q].tradeCount));
+                    hbids.price.push(parseFloat(data.hbids[q].price));
+                    hbids.cumQuant.push(parseFloat(cum.toFixed(2)));
+                    
+                    hbidsTablebody.append(hroww);
+                }
+                // Huobi market depth 
+                var hfinalCumQuant = hasks.cumQuant.reverse().concat(hbids.cumQuant);
+                var hfinalPrices = hasks.price.reverse().concat(hbids.price);
+                //Huobi market depth update
+                myBarChart3.data.labels = hfinalPrices;
+                myBarChart3.data.datasets[0].data = hfinalCumQuant;
+                myBarChart3.data.datasets[0].data.map((currentValue, index, array) => {
+                    array[index] = currentValue * -1;
+                });
+                myBarChart3.options.scales.xAxes[0].ticks.callback = function(value, index, values) {
+                    return value * -1;
+                };
+                myBarChart3.update();
+
+
+                // Binance asks table 
                 var asksTablebody = $('#asksTable tbody');
                 asksTablebody.empty();
                 var asks = {
@@ -327,7 +449,7 @@
                 var cum = 0;
                 for (var l = 0; l < data.ask.data.length; l++) {
                     asks.price.push(parseFloat(data.ask.data[l].adv.price));
-                    asks.quant.push(parseFloat(data.ask.data[l].adv.tradableQuantity))
+                    asks.quant.push(parseFloat(data.ask.data[l].adv.tradableQuantity));
                     cum += parseFloat(data.ask.data[l].adv.tradableQuantity);
                     asks.cumQuant.push(parseFloat(cum.toFixed(2)));
                 }
@@ -340,6 +462,7 @@
                     asksTablebody.append(row);
                     p -= 1;
                 }
+                // Binance bids table 
                 var bidsTablebody = $('#bidsTable tbody');
                 bidsTablebody.empty();
                 var bids = {
@@ -347,34 +470,30 @@
                     quant: [],
                     cumQuant: []
                 };
-                var sum = 0;
+                var cum = 0;
                 for (var q = 0; q < data.bid.data.length; q++) {
                     var roww = $('<tr>');
-                    roww.append($('<td>').text(data.bid.data[q].adv.price ));
+                    roww.append($('<td>').text(data.bid.data[q].adv.price));
                     roww.append($('<td>').html('<a href="https://p2p.binance.com/en/advertiserDetail?advertiserNo=' + data.bid.data[q].advertiser.userNo + '">' + data.bid.data[q].adv.tradableQuantity + '</a>'));
-                    sum += parseFloat(data.bid.data[q].adv.tradableQuantity);
-                    roww.append($('<td>').text(sum.toFixed(2)));
+                    cum += parseFloat(data.bid.data[q].adv.tradableQuantity);
+                    roww.append($('<td>').text(cum.toFixed(2)));
 
-                    bids.quant.push(parseFloat(data.bid.data[q].adv.tradableQuantity))
+                    bids.quant.push(parseFloat(data.bid.data[q].adv.tradableQuantity));
                     bids.price.push(parseFloat(data.bid.data[q].adv.price));
-                    bids.cumQuant.push(parseFloat(sum.toFixed(2)));
+                    bids.cumQuant.push(parseFloat(cum.toFixed(2)));
                     
                     bidsTablebody.append(roww);
                 }
+                // Binance market depth 
                 var finalCumQuant = asks.cumQuant.reverse().concat(bids.cumQuant);
                 var finalPrices = asks.price.reverse().concat(bids.price);
-                var cumulativeBidQuantity = 0;
-                var cumulativeBidsData = [];
-                for (var i = data.bid.data.length - 1; i >= 0; i--) {
-                    cumulativeBidQuantity += parseFloat(data.bid.data[i].adv.tradableQuantity);
-                    cumulativeBidsData.push([parseFloat(data.bid.data[i].adv.price), cumulativeBidQuantity]);
+                if (data && data.hasOwnProperty('gasks')) {
+                    // Garantex market depth 
+                    var finalCumQuantG =garantex_asks_cum.cumQuant.reverse().concat(garantex_bids_cum.cumQuant);
+                    var finalPricesG = garantex_asks_cum.price.reverse().concat(garantex_bids_cum.price);
                 }
-                var cumulativeAskQuantity = 0;
-                var cumulativeAsksData = [];
-                for (var i = 0; i < data.ask.data.length; i++) {
-                    cumulativeAskQuantity += parseFloat(data.ask.data[i].adv.tradableQuantity);
-                    cumulativeAsksData.push([parseFloat(data.ask.data[i].adv.price), cumulativeAskQuantity]);
-                }
+
+                //Binance market depth update
                 myBarChart.data.labels = finalPrices;
                 myBarChart.data.datasets[0].data = finalCumQuant;
                 myBarChart.data.datasets[0].data.map((currentValue, index, array) => {
@@ -384,52 +503,91 @@
                     return value * -1;
                 };
                 myBarChart.update();
-                var minAsk = asks.price.reverse()[0]
-                var maxBid = bids.price[0]
-                var midPrice = (minAsk + maxBid) / 2;
-                var spread = parseFloat(maxBid-minAsk).toFixed(3)
-                var marketPriceElement = $('#marketPrice');
-                marketPriceElement.text(midPrice.toFixed(3) + " " + "Spread:  " + spread);
 
-                var bid = [];
-                for (var i = 0; i < data.bid.data.length; i++) {
-                    var item = data.bid.data[i];
-                    var obj = {
-                    price: item.adv.price,
-                    quantity: item.adv.tradableQuantity
+                if (data && data.hasOwnProperty('gasks')) {
+                    //Garantex market depth update
+                    myBarChart2.data.labels = finalPricesG;
+                    myBarChart2.data.datasets[0].data = finalCumQuantG;
+                    myBarChart2.data.datasets[0].data.map((currentValue, index, array) => {
+                        array[index] = currentValue * 1;
+                    });
+                    myBarChart2.options.scales.xAxes[0].ticks.callback = function(value, index, values) {
+                        return value * 1;
                     };
-                    bid.push(obj);
+                    myBarChart2.update();    
                 }
-                var ask = [];
-                for (var i = 0; i < data.ask.data.length; i++) {
-                    var item = data.ask.data[i];
-                    var obj = {
-                    price: item.adv.price,
-                    quantity: item.adv.tradableQuantity
-                    };
-                    ask.push(obj);
+                
+                // Market price and Spread Binance
+                var minAsk = asks.price.reverse()[0];
+                var maxBid = bids.price[0];
+                var midPrice = (minAsk + maxBid) / 2;
+                var spread = parseFloat(maxBid-minAsk).toFixed(3);
+
+                // Huobi
+                var huobi_minAsk = hasks.price.reverse()[0];
+                var huobi_maxBid = hbids.price[0];
+                var huobi_midPrice = (huobi_minAsk + huobi_maxBid)/2;
+                var huobi_spread = parseFloat(huobi_maxBid - huobi_minAsk).toFixed(3);
+
+                var marketPriceElement3 = $('#marketPrice3');
+                marketPriceElement3.text(huobi_midPrice.toFixed(3) + " " + "Spread:  " + huobi_spread);
+
+                var marketPriceElement = $('#marketPrice');
+                if (data && data.hasOwnProperty('gasks')) {
+                    var minAskG = garantex_asks_cum.price.reverse()[0];
+                    var maxBidG = garantex_bids_cum.price[0];
+                    var buyBinance = maxBidG - minAsk;
+
+                    marketPriceElement.text(midPrice.toFixed(3) + " " + "Spread:  " + spread);
+
+                    // Market price and Spread Garantex
+                    var midPriceG = (minAskG + maxBidG) / 2;
+                    var spreadG = parseFloat(maxBidG-minAskG).toFixed(3);
+
+                    var marketPriceElementG = $('#marketPrice2');
+                    var buyGarantex = maxBid - minAskG;
+                    marketPriceElementG.text(midPriceG.toFixed(3) + " " + "Spread:  " + spreadG);
+
+                    // Получаем таблицу по ID
+                    var table = document.getElementById('CrossRatesTable');
+
+                    // Получаем строки таблицы
+                    var rows = table.getElementsByTagName('tr');
+                    rows[1].getElementsByTagName('td')[3].innerHTML = buyBinance.toFixed(3).toString();
+                    rows[2].getElementsByTagName('td')[3].innerHTML = (maxBidG - huobi_minAsk).toFixed(3).toString();
+                    rows[3].getElementsByTagName('td')[1].innerHTML = buyGarantex.toFixed(3).toString();
+                    rows[3].getElementsByTagName('td')[2].innerHTML = (huobi_maxBid-minAskG).toFixed(3).toString();
+                    rows[3].getElementsByTagName('td')[3].innerHTML = spreadG.toString();
+                } else{
+                    marketPriceElement.text(midPrice.toFixed(3) + " " + "Spread:  " + spread);
+                    marketPriceElement3.text(huobi_midPrice.toFixed(3) + " " + "Spread:  " + huobi_spread);
                 }
-                var totalBidQuantity = cumulativeBidQuantity;
-                var totalAskQuantity = cumulativeAskQuantity;
-                var bidPercentage = (totalBidQuantity / (totalBidQuantity + totalAskQuantity)) * 100;
-                var askPercentage = (totalAskQuantity / (totalBidQuantity + totalAskQuantity)) * 100;
-                marketChart.data.datasets[0].data = [];
-                marketChart.update();
-                marketChart.data.datasets[0].data.push(bidPercentage, askPercentage);
-                marketChart.update();
-                const homeFundamentals = document.querySelector('.home-fundamentals');
-                const height = homeFundamentals.offsetHeight;
-                const canvas = document.getElementById('vol');
-                canvas.height = height;
+
+                // Получаем таблицу по ID
+                var table = document.getElementById('CrossRatesTable');
+
+                // Получаем строки таблицы
+                var rows = table.getElementsByTagName('tr');
+
+                // Обновляем ячейки
+                rows[1].getElementsByTagName('td')[1].innerHTML = spread.toString();
+                rows[1].getElementsByTagName('td')[2].innerHTML = (huobi_maxBid - minAsk).toFixed(3).toString();
+                // rows[1].getElementsByTagName('td')[3].innerHTML = 'new B:G';
+                rows[2].getElementsByTagName('td')[1].innerHTML = (maxBid - huobi_minAsk).toFixed(3).toString();
+                rows[2].getElementsByTagName('td')[2].innerHTML = huobi_spread.toString();
+                // rows[2].getElementsByTagName('td')[3].innerHTML = 'new H:G';
+                // rows[3].getElementsByTagName('td')[1].innerHTML = 'new G:B';
+                // rows[3].getElementsByTagName('td')[2].innerHTML = 'new G:H';
+                // rows[3].getElementsByTagName('td')[3].innerHTML = 'new G:G';
             }
         });
     };
     
     $(document).ready(function() {
-        setInterval(updateTable, 3000);
+        setInterval(updateTable, 4000);
     });
 </script>
-<table style="display: flex;">
+<table style="display: flex; width: 100%; height:100%;">
     <td style="flex: 1;"><canvas id="vol" style="display: flex; width: 300px; align-self: stretch;"></canvas></td>
     <td style="flex: 1;"><div class="home-fundamentals">      
         <table class="asksTable" id="asksTable">
@@ -470,117 +628,132 @@
                 </tbody>
             </table>
     </td>
-    <td style="flex: 1;"  colspan="2">
-        <div class="tradingview-widget-container" style="width: 100%;">
-        <div class="tradingview-widget-container__widget"></div>
-        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
-        {
-        "width": "735",
-        "height": "600",
-        "symbolsGroups": [
-            {
-            "name": "Crypto",
-            "originalName": "Indices",
-            "symbols": [
-                {
-                "name": "BINANCE:BTCUSDT",
-                "displayName": "Bitcoin"
-                },
-                {
-                "name": "BINANCE:ETHUSDT",
-                "displayName": "Ethereum"
-                },
-                {
-                "name": "BINANCEUS:USDTUSD",
-                "displayName": "Tether"
-                },
-                {
-                "name": "BINANCE:BUSDUSDT",
-                "displayName": "Binance USD"
-                },
-                {
-                "name": "CRYPTOCAP:BTC",
-                "displayName": "BTC Marketcap"
-                },
-                {
-                "name": "BINANCE:USDTRUB",
-                "displayName": "USDT/RUB"
-                }
-            ]
-            },
-            {
-            "name": "Forex",
-            "originalName": "Forex",
-            "symbols": [
-                {
-                "name": "FX:EURUSD",
-                "displayName": "EUR/USD"
-                },
-                {
-                "name": "FX:GBPUSD",
-                "displayName": "GBP/USD"
-                },
-                {
-                "name": "FX:USDJPY",
-                "displayName": "USD/JPY"
-                },
-                {
-                "name": "FX:USDCHF",
-                "displayName": "USD/CHF"
-                },
-                {
-                "name": "FX:AUDUSD",
-                "displayName": "AUD/USD"
-                },
-                {
-                "name": "FX:USDCAD",
-                "displayName": "USD/CAD"
-                },
-                {
-                "name": "FX_IDC:USDKGS",
-                "displayName": "USD/KGS"
-                },
-                {
-                "name": "FX_IDC:USDUZS",
-                "displayName": "USD/UZS"
-                },
-                {
-                "name": "FX_IDC:USDKZT",
-                "displayName": "USD/KZT"
-                },
-                {
-                "name": "FOREXCOM:USDTRY",
-                "displayName": "USD/TRY"
-                },
-                {
-                "name": "FX_IDC:CNYUSD",
-                "displayName": "CNY/USD"
-                },
-                {
-                "name": "USD/FX_IDC:JPYUSD",
-                "displayName": "JPY/USD"
-                },
-
-                {
-                "name": "FX:NZDUSD",
-                "displayName": "NZD/USD"
-                }
-            ]
-            }
-        ],
-        "showSymbolLogo": false,
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "locale": "en"
-        }
-        </script>
-        </div>
+    <td style="flex: 1;"><div class="home-fundamentals">      
+        <table class="asksTable" id="GasksTable">
+            <thead>
+            <tr>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total Quantity</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for item in gasks reversed %}
+                <tr>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.volume }}</td>
+                    <td>⟲</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <span id="marketPrice2">⟲</span>
+            <table class="bidsTable" id='GbidsTable'>
+                <thead>
+                <tr>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total Quantity</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in gbids %}
+                <tr>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.volume }}</td>
+                    <td>⟲</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
     </td>
+    <td style="flex: 1;"><canvas id="vol2" style="display: flex; width: 300px; align-self: stretch;"></canvas></td>
+</table>
+<table style="display: flex; width: 100%; height:100%;">
+    <td style="flex: 1;"><canvas id="vol3" style="display: flex; width: 300px; align-self: stretch;"></canvas></td>
+    <td style="flex: 1;"><div class="home-fundamentals">      
+        <table class="asksTable" id="hasksTable">
+            <thead>
+            <tr>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total Quantity</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for item in hasks reversed %}
+                <tr>
+                    <td>{{ item.price }}</td>
+                    <td><a href="https://www.huobi.com/ru-ru/fiat-crypto/trader/{{ item.uid }}">{{ item.tradeCount }}</a></td>
+                    <td>⟲</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <span id="marketPrice3">⟲</span>
+            <table class="bidsTable" id='hbidsTable'>
+                <thead>
+                <tr>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total Quantity</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in hbids %}
+                <tr>
+                    <td>{{ item.price }}</td>
+                    <td><a href="https://www.huobi.com/ru-ru/fiat-crypto/trader/{{ item.uid }}">{{ item.tradeCount }}</a></td>
+                    <td>⟲</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+    </td>
+    <td style="flex: 1;"><div class="home-fundamentals">
+    <table class="bidsTable" id='CrossRatesTable'>
+        <tbody>
+            <tr>
+                <td></td>
+                <td style="color: red;">Binance</td>
+                <td style="color: red;">Huobi</td>
+                <td style="color: red;">Garantex</td>
+            </tr>
+            <tr>
+                <td>Binance</td>
+                <td>B:B</td>
+                <td>B:H</td>
+                <td>B:G</td>
+            </tr>
+            <tr>
+                <td>Huobi</td>
+                <td>H:B</td>
+                <td>H:H</td>
+                <td>H:G</td>
+            </tr>
+            <tr>
+                <td>Garantex</td>
+                <td>G:B</td>
+                <td>G:H</td>
+                <td>G:G</td>
+            </tr>
+        </tbody>
+    </table>
+</table>
+<script>
+    const homeFundamentals = document.querySelector('.home-fundamentals');
+    const height = homeFundamentals.offsetHeight;
+    const canvas = document.getElementById('vol');
+    const canvas2 = document.getElementById('vol2');
+    const canvas3 = document.getElementById('vol3');
+    canvas.height = height;
+    canvas2.height = height;
+    canvas3.height = height;
+</script>
 </table>
 <div class="tradingview-widget-container">
     <div class="tradingview-widget-container__widget"></div>
-    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text"></span></a></div>
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
     {
     "symbols": [
@@ -633,124 +806,68 @@
   }
     </script>
   </div>
-<table style="display: flex; width: 100%;">
-    <td style="flex: 1;" id='tradingview_57a7c'>
-        <div class="tradingview-widget-container">
-            <div id="tradingview_57a7c"></div>
-            <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-            <script type="text/javascript">
-            new TradingView.widget(
-            {
-            "width": 980,
-            "height": 610,
-            "symbol": "BTCUSDT",
-            "interval": "D",
-            "timezone": "Europe/Moscow",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "withdateranges": true,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "watchlist": [
-            "BINANCE:BTCUSDT",
-            "BINANCE:ETHUSDT",
-            "BINANCE:BUSDUSDT",
-            "BINANCEUS:USDTUSD"
-            ],
-            "details": true,
-            "container_id": "tradingview_57a7c"
-        }
-            );
-            </script>
-        </div>
-    </td>
-    <td style="flex: 1;">
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-            {
-            "colorTheme": "dark",
-            "isTransparent": true,
-            "width": "330",
-            "height": "610",
-            "locale": "en",
-            "importanceFilter": "0,1"
-        }
-            </script>
-        </div>
-        <!-- TradingView Widget END -->
-    </td>
-</table>
-<script>
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        var tradingViewWidget = document.getElementById('tradingview_57a7c');
-        if (tradingViewWidget) {
-        tradingViewWidget.style.display = 'none';
-        } else {
-        console.log('Widget not found!');
-        }
+  <div id="Charts">
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_209a7"></div>
+      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text"></span></a></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {
+      "width": 980,
+      "height": 610,
+      "symbol": "BINANCE:BTCUSDT",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "dark",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": true,
+      "withdateranges": true,
+      "hide_side_toolbar": false,
+      "allow_symbol_change": true,
+      "details": true,
+      "calendar": true,
+      "container_id": "tradingview_209a7"
     }
-</script>
-<script>
-    const homeFundamentals = document.querySelector('.home-fundamentals');
-    const height = homeFundamentals.offsetHeight - 20;
-    const canvas = document.getElementById('vol');
-    canvas.height = height;
-</script>
-</table>
-<div style="display: flex; justify-content: center;">
-    <canvas id="marketChart"></canvas>
-    <script>
-        var bid = [
-        {% for item in bid.data %}
-        { price: {{ item.adv.price }}, quantity: {{ item.adv.tradableQuantity }} },
-        {% endfor %}
-        ];
-        var ask = [
-        {% for item in ask.data  %}
-        { price: {{ item.adv.price }}, quantity: {{ item.adv.tradableQuantity }} },
-        {% endfor %}
-        ];
-        var askReversed = [
-        {% for item in ask.data reversed  %}
-        { price: {{ item.adv.price }}, quantity: {{ item.adv.tradableQuantity }} },
-        {% endfor %}
-        ];
-        var merged = askReversed.concat(bid);
-        var bidQuantities = bid.map(function(item) { return item.quantity; }).reduce(function(acc, val) { return acc.concat(acc.length ? val + acc[acc.length - 1] : val); }, []);
-        var askQuantities = ask.map(function(item) { return item.quantity; }).reduce(function(acc, val) { return acc.concat(acc.length ? val + acc[acc.length - 1] : val); }, []);
-        var totalBidQuantity = bidQuantities.reduce(function(acc, val) { return acc + val; }, 0);
-        var totalAskQuantity = askQuantities.reduce(function(acc, val) { return acc + val; }, 0);
-        var bidPercentage = (totalBidQuantity / (totalBidQuantity + totalAskQuantity)) * 100;
-        var askPercentage = (totalAskQuantity / (totalBidQuantity + totalAskQuantity)) * 100;
-        var ctx = document.getElementById('marketChart').getContext('2d');
-        var marketChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['Demand', 'Supply'],
-            datasets: [{
-            label: 'Market',
-            data: [bidPercentage, askPercentage], 
-            backgroundColor: ['#00f449', '#ff6384'] 
-            }]
-        },
-        options: {
-            responsive: false, 
-            animation: {
-            duration: 0, 
-            easing: 'linear',
-            }
-        }
-        });
-    </script>
+      );
+      </script>
+    </div>
+  <script>
+    function toggleInfo() {
+      var checkbox = document.getElementById("myCheckbox");
+      var info = document.getElementById("Charts");
+      if (checkbox.checked) {
+        info.style.display = "block";
+        var canvas = document.getElementById("vol");
+        canvas.style.display = "block";
+        var canvas2 = document.getElementById("vol2");
+        canvas2.style.display = "block";
+      } else {
+        info.style.display = "none";
+      }
+    }
+  </script>
   </div>
     <script>
+        var bid = [
+            {% for item in bid.data %}
+            { price: {{ item.adv.price }}, quantity: {{ item.adv.tradableQuantity }} },
+            {% endfor %}
+        ];
+        var ask = [
+            {% for item in ask.data  %}
+            { price: {{ item.adv.price }}, quantity: {{ item.adv.tradableQuantity }} },
+            {% endfor %}
+        ];
+        var askReversed = [
+            {% for item in ask.data reversed  %}
+            { price: {{ item.adv.price }}, quantity: {{ item.adv.tradableQuantity }} },
+            {% endfor %}
+        ];
+        var merged = askReversed.concat(bid);
         var prices = merged.map(function(obj){
             return obj.price;
         });
@@ -760,8 +877,18 @@
         var data = {
             labels: prices,
             datasets: [{
-            label: "Market Depth",
+            label: "Binance Market Depth",
             backgroundColor: '#ffa500', 
+            borderWidth: 1,
+            data: quants,
+            yAxisID: "bar-y-axis1"
+            }]
+        };
+        var data2 = {
+            labels: prices,
+            datasets: [{
+            label: "Huobi Market Depth",
+            backgroundColor: '#2986cc', 
             borderWidth: 1,
             data: quants,
             yAxisID: "bar-y-axis1"
@@ -811,7 +938,76 @@
             data: data,
             options: options
         });
+        var btx = document.getElementById('vol3').getContext('2d');
+        var myBarChart3 = new Chart(btx, {
+            type: 'horizontalBar',
+            data:data2,
+            options:options
+        });
     </script>
+    <script>
+        var prices = merged.map(function(obj){
+            return obj.price;
+        });
+        var quants = merged.map(function(obj){
+            return obj.quantity;
+        });
+        var data = {
+            labels: prices,
+            datasets: [{
+            label: "Garantex Market Depth",
+            backgroundColor: '#40ff00', 
+            borderWidth: 1,
+            data: quants,
+            yAxisID: "bar-y-axis1"
+            }]
+        };
+        data.datasets[0].data.map((currentValue, index, array) => {
+            array[index] = currentValue * 1;
+        });
+        var options = {
+            tooltips: {
+            callbacks: {
+                label: function(tooltipItem, data) {
+                var label = data.datasets[tooltipItem.datasetIndex].label || '';
+        
+                if (label) {
+                    label += ': ';
+                }
+                label += tooltipItem.xLabel * 1;
+                return label;
+                }
+            }
+            },
+            scales: {
+            yAxes: [{
+                id: "bar-y-axis1",
+                display: false,
+                categoryPercentage: 0.5,
+                barPercentage: 0.5,
+                position: 'right' 
+            }],
+            xAxes: [{
+                id: "bar-x-axis1",
+                display: false,
+                stacked: false,
+                ticks: {
+                callback: function(value, index, values) {
+                    return value * 1; 
+                },
+                beginAtZero: false
+                }
+            }]
+            }
+        };
+        var ctx = document.getElementById("vol2").getContext("2d");
+        var myBarChart2 = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: data,
+            options: options
+        });
+    </script>
+
 </body>
 {% else %}
     <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;'><style>body {background-color: #333;color: #FFA500;}a {color: #FFA500;}</style><title>Oops...</title><h1>Access Forbidden</h1><p>Hello! If you want to login to your profile, please go to the login page, which you can find at the following link. There you can enter your username and password to access your profile. If you encounter any issues with logging in, please contact our support team. Thank you!</p><p><a href='/' style='text-align:center;'>Login</a></p></div>

@@ -19,7 +19,7 @@ from assets.views import *
 from django.contrib import admin
 
 urlpatterns = [
-    path('api/v1/datafeed/', PlatformaRatesView.as_view(), name='datafeed'),
+    # path('api/v1/datafeed/', PlatformaRatesView.as_view(), name='datafeed'),
     path('',index, name='index'),
     path('terms/',terms, name='terms'),
     path('contact/',contact, name='contact'),
