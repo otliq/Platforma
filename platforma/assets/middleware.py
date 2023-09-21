@@ -3,6 +3,15 @@ from django.utils import timezone
 from .models import SessionProfile
 
 class SessionBlockMiddleware:
+    """
+    Middleware for blocking duplicate sessions that are created when logging in multiple access
+    To use:
+        Add it to settings.MIDDLEWARE collection
+
+    Main logic:
+        If user dont have session -> create session
+        else -> block all sessions except latest 
+    """
     def __init__(self, get_response):
         self.get_response = get_response
 

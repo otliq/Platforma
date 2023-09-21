@@ -1,56 +1,7 @@
 {% extends 'index.html' %}
 {% block content %}
-<style>
-    *{
-        box-sizing: border-box;
-    }
-    body{
-        background: #000000;
-        color: #eee;
-        font-family: "Times New Roman", serif;
-        padding: 50px;
-    }
-    .container{
-        margin: 20px auto;
-        padding: 10px;
-        width: 300px;
-        background-color: #000000;
-        height: 300px;
-        border-radius: 5px;
-    }
-     h1{
-         width: 70%;
-        color: #eee;
-        font-size: 32px;
-        margin: 28px auto;
-        margin-bottom: 20px;
-        text-align: center;
-        /*padding-top: 40px;*/
-    }
-    form{
-        /*padding: 15px;*/
-        text-align: center;
-    }
-    input{
-        padding: 12px 0;
-        margin-bottom: 10px;
-        border-radius: 3px;
-        border: 2px solid transparent;
-        text-align: center;
-        width: 90%;
-        font-size: 16px;
-        transition: border .2s, background-color .2s;
-    }
-
-    .pass-link{
-        text-align: center;
-    }
-    .pass-link a:link,
-    .pass-link a:visited{
-        font-size: 12px;
-        color: #777;
-    }
-</style>
+{% load static %}
+<link rel="stylesheet" href="{% static 'assets/css/login.css' %}">
 <div class="container">
     <h3>Login</h3>
     <form action="#" method="POST">
@@ -67,6 +18,6 @@
     </div>	
 </div>
 {% if user.is_authenticated %}
-    <meta http-equiv="refresh" content="5; url={% url 'results' %}">
+    <meta http-equiv="refresh" content="1; url={% url 'results' %}">
 {% endif %}
 {% endblock %}

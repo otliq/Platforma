@@ -1,154 +1,13 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>P2P market</title>
+  <title>Platforma</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<style>
-    body {
-        background: #000000;
-        color: #eee;
-        padding: 0;
-        margin: 0;
-        justify-content: center;
-    }
-      .home-header {
-        width: 100%;
-        height: 130px;
-        display: flex;
-        max-width: var(--dl-size-size-maxwidth);
-        align-items: center;
-        padding-top: var(--dl-space-space-twounits);
-        padding-left: var(--dl-space-space-threeunits);
-        padding-right: var(--dl-space-space-threeunits);
-        padding-bottom: var(--dl-space-space-twounits);
-        justify-content: space-between;
-      }
-      .home-btn-group {
-          display: flex;
-          align-items: center;
-          flex-direction: row;
-          flex-wrap: wrap;
-        }
-
-      .home-container1 {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        margin-bottom: var(--dl-space-space-threeunits);
-        justify-content: space-between;
-      }
-      .home-menu-close {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .home-main {
-        flex: 0 0 auto;
-        width: auto;
-        height: auto;
-        display: flex;
-        align-self: center;
-        align-items: center;
-        justify-content: center;
-      }
-      .home-select {
-        align-self: center;
-        margin-top: 20px;
-        margin-left: 20px;
-        margin-right: 20px;
-        padding-left: 20px;
-        margin-bottom: 20px;
-      }
-      .home-select1 {
-        align-self: center;
-        margin-top: 20px;
-        margin-left: 20px;
-        margin-right: 20px;
-        padding-left: 20px;
-        margin-bottom: 20px;
-      }
-      .home-select2 {
-        align-self: center;
-        margin-top: 20px;
-        margin-left: 20px;
-        margin-right: 20px;
-        padding-left: 20px;
-        margin-bottom: 20px;
-      }
-      .home-select3 {
-        align-self: center;
-        margin-top: 20px;
-        margin-left: 20px;
-        margin-right: 20px;
-        padding-left: 20px;
-        margin-bottom: 20px;
-      }
-      @media(max-width: 767px) {
-        .home-header {
-          padding-left: var(--dl-space-space-twounits);
-          padding-right: var(--dl-space-space-twounits);
-        }
-
-      }
-      @media(max-width: 479px) {
-        .home-header {
-          padding: var(--dl-space-space-unit);
-        }
-      }
-        .home-fundamentals{
-            width: 300px;
-            max-width: 300px;
-            border: 1px solid #272624;
-            margin: 0 auto; /* горизонтальные отступы равны "auto" */
-        }
-        #marketPrice,#marketPrice2,#marketPrice3 {
-            display: block;
-            text-align: left;
-            font-size: 15px;
-            margin-top: 20px;
-        }
-        table.asksTable, table.bidsTable {
-            border-collapse: separate;
-            border-spacing: 2px;
-            color: #FFFFFF;
-        }
-        
-        table.asksTable td, table.asksTable th, table.bidsTable th, table.bidsTable td {
-            text-align: center;
-        }
-        
-        table.asksTable th:nth-of-type(1) {
-            color: white;
-        }
-        
-        table.asksTable thead,
-        table.bidsTable thead {
-            background-color: #000000;
-        }
-        
-        .bidsTable thead {
-            visibility: hidden;
-        }
-        table.asksTable a,
-        table.bidsTable a {
-            color: inherit; /* наследуем цвет текста от родительского элемента */
-            text-decoration: none; /* добавляем подчеркивание для ссылок */
-        }
-        
-        .asksTable td:first-child {
-            color: red;
-        }
-        
-        .bidsTable td:first-child {
-            color: green;
-        }
-        #Charts {
-          display: none;
-        }
-</style>
+  <link rel="stylesheet" href="{% static 'assets/css/terminal.css' %}">
 </head>
 {% if user.is_authenticated %}
 <body>
@@ -164,8 +23,8 @@
 <div class="home-main">
     <span>Fiat</span>
     <select name="Fiat" required class="home-select">
-        <option value="RUB">RUB</option>
         <option value="USD">USD</option>
+        <option value="RUB">RUB</option>
         <option value="UZS">UZS</option>
         <option value="TRY">TRY</option>
         <option value="KGS">KGS</option>
@@ -177,119 +36,10 @@
         <option value="CAD">CAD</option>
         <option value="AUD">AUD</option>
         <option value="NZD">NZD</option>
-        <!-- <option value="KWD">KWD</option> -->
     </select>
     <span>Trade Method</span>
     <select name="Trade Method" required class="home-select2"></select>
-    <script>
-        const fiatOptions = {
-        RUB: [
-            { value: "TinkoffNew", text: "Tinkoff" },
-            { value: "RosBankNew", text: "Rosbank" },
-            { value: "RaiffeisenBank", text: "RaiffeisenBank" },
-            { value: "QIWI", text: "Qiwi" },
-            { value: "BANK", text: "BANK" },
-        ],
-        USD: [
-            { value: "Wise", text: "Wise" },
-            { value: "Zelle", text: "Zelle" },
-            { value: "WiseInstant", text: "Wise Instant" },
-            { value: "AirTM", text: "AirTM" },
-        ],
-        UZS: [
-            { value: "Humo", text: "Humo" },
-            { value: "Uzcard", text: "Uzcard" },
-            { value: "Anorbank", text: "Anorbank" },
-            { value: "IpakYuliBank", text: "Ipak Yuli Bank" },
-        ],
-        TRY: [
-            { value: "Ziraat", text: "Ziraat" },
-            { value: "VakifBank", text: "VakifBank" },
-            { value: "Garanti", text: "Garanti" },
-            { value: "DenizBank", text: "Denizbank" },
-            { value: "BANK", text: "BANK" },
-        ],
-        KGS: [
-            { value: "mBank", text: "mBank" },
-            { value: "OPTIMABANK", text: "Optima Bank" },
-            { value: "DEMIRBANK", text: "DemirBank" },
-
-        ],
-        KZT: [
-            { value: "KaspiBank", text: "Kaspi Bank" },
-            { value: "HalykBank", text: "Halyk Bank" },
-            { value: "JysanBank", text: "Jysan Bank" },
-            { value: "BANK", text: "BANK" },
-        ],
-        EUR: [
-            { value: "Wise", text: "Wise" },
-            { value: "WiseInstant", text: "Wise Instant" },
-            { value: "Revolut", text: "Revolut" },
-            { value: "BANK", text: "BANK" },
-        ],
-        CNY: [
-            { value: "ALIPAY", text: "Alipay" },
-            { value: "WECHAT", text: "WeChat" },
-            { value: "BANK", text: "BANK" },
-        ],
-        GBP: [
-            { value: "Wise", text: "Wise" },
-            { value: "WiseInstant", text: "Wise Instant" },
-            { value: "Revolut", text: "Revolut" },
-            { value: "BANK", text: "BANK" },
-        ],
-        JPY: [
-            { value: "LINEPay", text: "LINE pay" },
-            { value: "BANK", text: "BANK" },
-        ],
-        CHF: [
-            { value: "FPS", text: "Instant Transfer" },
-            { value: "Wise", text: "Wise" },
-            { value: "BANK", text: "BANK" },
-        ],
-        CAD: [
-            { value: "InteracETransfer", text: "Interac e-Transfer" },
-            { value: "TDbank", text: "TD bank" },
-            { value: "CIBCbank", text: "CIBC" },
-            { value: "RBCRoyalbank", text: "RBC Royal bank" },
-            { value: "BMObank", text: "BMO" },
-            { value: "BANK", text: "BANK" },
-        ],
-        AUD: [
-            { value: "Wise", text: "Wise" },
-            { value: "Revolut", text: "Revolut" },
-            { value: "OKSO", text: "OSKO" },
-            { value: "BANK", text: "BANK" },
-        ],
-        NZD: [
-            { value: "Wise", text: "Wise" },
-            { value: "BANK", text: "BANK" },
-        ],
-        // KWD: [
-        //     { value: "KFH", text: "Kuwait Finance House" },
-        //     { value: "BANK", text: "BANK" },
-        // ],
-        };
-        const fiatSelect = document.querySelector('select[name="Fiat"]');
-        const tradeMethodSelect = document.querySelector(
-        'select[name="Trade Method"]'
-        );
-        function updateTradeMethodOptions() {
-        tradeMethodSelect.innerHTML = "";
-        const selectedFiat = fiatSelect.value;
-        const options = fiatOptions[selectedFiat];
-        options.forEach((option) => {
-            const optionElement = document.createElement("option");
-            optionElement.value = option.value;
-            optionElement.text = option.text;
-            tradeMethodSelect.appendChild(optionElement);
-        });
-        }
-        fiatSelect.addEventListener("change", () => {
-        updateTradeMethodOptions();
-        });
-        updateTradeMethodOptions();
-    </script>
+    <script src="{% static "assets/js/terminal.js" %}"></script>
     <span>Crypto</span>
     <br />
     </span>
@@ -357,7 +107,7 @@
                         var grow = $('<tr>');
                         grow.append($('<td>').text(parseFloat(data.gasks[f].price)));
                         // grow.append($('<td>').text(parseFloat(data.gasks[f].volume)));
-                        grow.append($('<td>').html('<a href="https://garantex.io/trading/' + data.link + '">' + data.gasks[f].volume + '</a>'));
+                        grow.append($('<td>').html('<a href="https://garantex.org/trading/' + data.link + '">' + data.gasks[f].volume + '</a>'));
                         grow.append($('<td>').text(garantex_asks_cum.cumQuant[s].toFixed(2)));
                         gasksTablebody.append(grow);
                         s -= 1;
@@ -369,7 +119,7 @@
                     for (var x = 0; x < data.gbids.length; x++) {
                         var grow2 = $('<tr>');
                         grow2.append($('<td>').text(data.gbids[x].price));
-                        grow2.append($('<td>').html('<a href="https://garantex.io/trading/' + data.link + '">' + data.gbids[x].volume + '</a>'));
+                        grow2.append($('<td>').html('<a href="https://garantex.org/trading/' + data.link + '">' + data.gbids[x].volume + '</a>'));
                         // grow2.append($('<td>').text(data.gbids[x].volume));
                         cum += parseFloat(data.gbids[x].volume);
                         grow2.append($('<td>').text(cum.toFixed(2)));
@@ -807,7 +557,6 @@
     </script>
   </div>
   <div id="Charts">
-    <!-- TradingView Widget BEGIN -->
     <div class="tradingview-widget-container">
       <div id="tradingview_209a7"></div>
       <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text"></span></a></div>
@@ -835,21 +584,6 @@
       );
       </script>
     </div>
-  <script>
-    function toggleInfo() {
-      var checkbox = document.getElementById("myCheckbox");
-      var info = document.getElementById("Charts");
-      if (checkbox.checked) {
-        info.style.display = "block";
-        var canvas = document.getElementById("vol");
-        canvas.style.display = "block";
-        var canvas2 = document.getElementById("vol2");
-        canvas2.style.display = "block";
-      } else {
-        info.style.display = "none";
-      }
-    }
-  </script>
   </div>
     <script>
         var bid = [

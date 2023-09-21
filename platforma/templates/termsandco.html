@@ -1,61 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Terms and Conditions</title>
+    <link rel="stylesheet" href="{% static 'assets/css/terms.css' %}">
   </head>
-  <style>
-        *{
-            box-sizing: border-box;
-        }
-        body{
-            background: #000000;
-            color: #eee;
-            font-family: "Times New Roman", serif;
-            padding: 50px;
-            font-size: 16px;
-        }
-        .container{
-            margin: 20px auto;
-            padding: 10px;
-            width: 300px;
-            background-color: #000000;
-            height: 300px;
-            border-radius: 5px;
-        }
-         h1{
-             width: 70%;
-            color: #eee;
-            font-size: 32px;
-            margin: 28px auto;
-            margin-bottom: 20px;
-            text-align: center;
-            /*padding-top: 40px;*/
-        }
-        form{
-            /*padding: 15px;*/
-            text-align: center;
-        }
-        input{
-            padding: 12px 0;
-            margin-bottom: 10px;
-            border-radius: 3px;
-            border: 2px solid transparent;
-            text-align: center;
-            width: 90%;
-            font-size: 16px;
-            transition: border .2s, background-color .2s;
-        }
-    
-        .pass-link{
-            text-align: center;
-        }
-        .pass-link a:link,
-        .pass-link a:visited{
-            font-size: 16px;
-            color: #eee;
-        }
-    </style>
+
   <body>
     <div style="display: flex;">
       <div style="width: 50%; margin-right: 20px; justify-content: center; border: 1px solid orange;">
@@ -106,7 +57,7 @@
       </div>
     </div>
     <div class="pass-link">
-        <label><a href="{% url 'login' %}" >I agree with the Terms and Conditions</a></label>
+        <label><a href="{% url 'results' %}" >I agree with the Terms and Conditions</a></label>
     </div>	
   </body>
 </html>

@@ -1,13 +1,18 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.contrib.sessions.models import Session
-
-
-class Instrument(models.Model):
-    name = models.CharField(max_length=25)
-    price = models.DecimalField(max_digits=15, decimal_places=2)
 
 class SessionProfile(models.Model):
+    """
+    Модель сессии пользователя.
+
+    Attributes:
+        user_id (IntegerField): ID пользователя.
+        session_key (CharField): Ключ сессии.
+        ip_address (CharField): IP-адрес пользователя.
+        last_accessed (DateTimeField): Дата и время последнего доступа.
+
+    Methods:
+        __str__(): Возвращает строковое представление объекта профиля сессии.
+    """
     user_id = models.IntegerField()
     session_key = models.CharField(max_length=40, unique=True)
     ip_address = models.CharField(max_length=20)

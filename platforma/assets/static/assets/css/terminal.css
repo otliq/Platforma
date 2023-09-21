@@ -1,0 +1,141 @@
+body {
+    background: #000000;
+    color: #eee;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+}
+  .home-header {
+    width: 100%;
+    height: 130px;
+    display: flex;
+    max-width: var(--dl-size-size-maxwidth);
+    align-items: center;
+    padding-top: var(--dl-space-space-twounits);
+    padding-left: var(--dl-space-space-threeunits);
+    padding-right: var(--dl-space-space-threeunits);
+    padding-bottom: var(--dl-space-space-twounits);
+    justify-content: space-between;
+  }
+  .home-btn-group {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+  .home-container1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--dl-space-space-threeunits);
+    justify-content: space-between;
+  }
+  .home-menu-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .home-main {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    display: flex;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+  }
+  .home-select {
+    align-self: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+  .home-select1 {
+    align-self: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+  .home-select2 {
+    align-self: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+  .home-select3 {
+    align-self: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+  @media(max-width: 767px) {
+    .home-header {
+      padding-left: var(--dl-space-space-twounits);
+      padding-right: var(--dl-space-space-twounits);
+    }
+
+  }
+  @media(max-width: 479px) {
+    .home-header {
+      padding: var(--dl-space-space-unit);
+    }
+  }
+    .home-fundamentals{
+        width: 300px;
+        max-width: 300px;
+/*            border: 1px solid #272624;*/
+        margin: 0 auto; /* горизонтальные отступы равны "auto" */
+    }
+    #marketPrice,#marketPrice2,#marketPrice3 {
+        display: block;
+        text-align: left;
+        font-size: 15px;
+        margin-top: 20px;
+    }
+    table.asksTable, table.bidsTable {
+        border-collapse: separate;
+        border-spacing: 2px;
+        color: #FFFFFF;
+    }
+    
+    table.asksTable td, table.asksTable th, table.bidsTable th, table.bidsTable td {
+        text-align: center;
+    }
+    
+    table.asksTable th:nth-of-type(1) {
+        color: white;
+    }
+    
+    table.asksTable thead,
+    table.bidsTable thead {
+        background-color: #000000;
+    }
+    
+    .bidsTable thead {
+        visibility: hidden;
+    }
+    table.asksTable a,
+    table.bidsTable a {
+        color: inherit; /* наследуем цвет текста от родительского элемента */
+        text-decoration: none; /* добавляем подчеркивание для ссылок */
+    }
+    
+    .asksTable td:first-child {
+        color: red;
+    }
+    
+    .bidsTable td:first-child {
+        color: green;
+    }
+    #Charts {
+      display: none;
+    }
